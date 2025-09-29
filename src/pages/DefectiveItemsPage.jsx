@@ -5,8 +5,10 @@ import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import { useNavigate } from 'react-router-dom';
 
 export default function DefectiveItemsPage() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
@@ -27,7 +29,7 @@ export default function DefectiveItemsPage() {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 6, mb: 6 }}>
-      <Paper sx={{ p: 4, mb: 4, boxShadow: 3 }}>
+  <Paper sx={{ p: 4, mb: 4, boxShadow: 3 }}>
         <Typography variant="h4" sx={{ mb: 2, fontWeight: 700 }} color="error.main">
           Defective Items
         </Typography>
@@ -73,7 +75,7 @@ export default function DefectiveItemsPage() {
             </Box>
           </Box>
         )}
-  <Button sx={{ mt: 4 }} href="/owner" variant="outlined">Back to Dashboard</Button>
+        <Button sx={{ mt: 4 }} variant="outlined" onClick={() => navigate('/owner')}>Back to Dashboard</Button>
       </Paper>
     </Container>
   );
