@@ -13,7 +13,9 @@ import ProductDialog from '../components/ProductDialog';
 import Chatbot from '../components/Chatbot';
 import { searchTextApi, searchImageApi, fetchCategoryDataSamples } from '../config/analysisApi';
 import { fetchInventoryAnalysis } from '../config/analysisApi';
+import { fetchForecast } from '../config/predictApi';
 import { useNavigate } from 'react-router-dom';
+import { useCallback } from 'react';
 import { useEffect } from 'react';
 
 import CircularProgress from '@mui/material/CircularProgress';
@@ -244,13 +246,40 @@ export default function OwnerPage() {
             </Paper>
           </Grid>
           <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 2, opacity: 0.6, pointerEvents: 'none', position: 'relative' }}>
-              <Box sx={{ position: 'absolute', top: 8, right: 8, bgcolor: 'warning.light', color: 'warning.dark', px: 1, borderRadius: 1, fontSize: 12, fontWeight: 600 }}>Coming Soon</Box>
+            <Paper sx={{ p: 2 }}>
               <Typography variant="subtitle1">Predictive Analytics</Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 AI-powered demand forecasting and trend analysis
               </Typography>
-              <Button variant="outlined" fullWidth disabled>Generate Forecast</Button>
+              <form
+                onSubmit={async e => {
+                  e.preventDefault();
+                  const formData = new FormData(e.target);
+                  const product_id = formData.get('product_id');
+                  const weeks = Number(formData.get('weeks')) || 4;
+                  const lead_time_weeks = Number(formData.get('lead_time_weeks')) || 1;
+                  const z = Number(formData.get('z')) || 1.65;
+                  try {
+                    const result = await fetchForecast({ product_id, weeks, lead_time_weeks, z });
+                    navigate('/forecast-results', { state: { forecast: result } });
+                  } catch (err) {
+                    alert('Failed to fetch forecast.');
+                  }
+                }}
+                style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
+              >
+                <TextField
+                  name="product_id"
+                  label="Product ID"
+                  defaultValue={results[0]?.id || ''}
+                  required
+                  sx={{ mb: 2 }}
+                />
+                <TextField name="weeks" label="Weeks" type="number" defaultValue={4} sx={{ mb: 2 }} />
+                <TextField name="lead_time_weeks" label="Lead Time (weeks)" type="number" defaultValue={1} sx={{ mb: 2 }} />
+                <TextField name="z" label="Z-score" type="number" defaultValue={1.65} sx={{ mb: 2 }} />
+                <Button variant="contained" type="submit">Generate Forecast</Button>
+              </form>
             </Paper>
           </Grid>
           <Grid item xs={12} md={4}>
@@ -265,19 +294,7 @@ export default function OwnerPage() {
           </Grid>
         </Grid>
 
-        {/* Forecast Modal (if generated) */}
-        {forecast && (
-          <Paper sx={{ p: 2, mt: 3 }}>
-            <Typography variant="subtitle1">Forecast</Typography>
-            <Typography variant="body2" sx={{ mb: 2 }}>{forecast.summary}</Typography>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              {forecast.items.map(i => (
-                <img key={i.id} src={i.image_url} alt={i.name} style={{ width: 80, height: 100, objectFit: 'cover', borderRadius: 6 }} />
-              ))}
-            </Box>
-            <Button sx={{ mt: 2 }} onClick={() => setForecast(null)}>Close</Button>
-          </Paper>
-        )}
+        {/* Forecast Table is now shown on /forecast-results page */}
 
       </Container>
       <ProductDialog open={!!selected} onClose={() => setSelected(null)} product={selected} />

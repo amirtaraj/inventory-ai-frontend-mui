@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage'
 import AuthPage from './pages/AuthPage'
 import ConsumerPage from './pages/ConsumerPage'
 import OwnerPage from './pages/OwnerPage'
+import ForecastResultsPage from './pages/ForecastResultsPage';
 import DefectiveItemsPage from './pages/DefectiveItemsPage';
 
 export default function App(){
@@ -13,7 +14,8 @@ export default function App(){
       <Route path="/auth" element={<AuthPage/>} />
       <Route path="/consumer" element={<ConsumerPage/>} />
       <Route path="/owner" element={<OwnerPage/>} />
-      <Route path="/defective-items" element={<DefectiveItemsPage/>} />
+  <Route path="/defective-items" element={<DefectiveItemsPage/>} />
+  <Route path="/forecast-results" element={<ForecastResultsPage/>} />
     </Routes>
   )
 }
