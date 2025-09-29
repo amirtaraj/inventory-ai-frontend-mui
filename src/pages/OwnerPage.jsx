@@ -16,6 +16,7 @@ import { fetchInventoryAnalysis } from '../config/analysisApi';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 
+import CircularProgress from '@mui/material/CircularProgress';
 export default function OwnerPage() {
   const [query, setQuery] = useState('');
   const [searchText, setSearchText] = useState('');
@@ -23,6 +24,7 @@ export default function OwnerPage() {
   const [results, setResults] = useState([]);
   const [defaultCategoryResults, setDefaultCategoryResults] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [forecast, setForecast] = useState(null);
   const [stats, setStats] = useState(null);
   const [loadingStats, setLoadingStats] = useState(true);
@@ -83,6 +85,7 @@ export default function OwnerPage() {
   // Search button handler
   const handleSearch = async () => {
     setQuery(searchText);
+    setSearchLoading(true);
     try {
       const data = await searchTextApi(searchText);
       if (data && Array.isArray(data.results)) {
@@ -92,6 +95,8 @@ export default function OwnerPage() {
       }
     } catch (err) {
       setResults([]);
+    } finally {
+      setSearchLoading(false);
     }
   };
 
@@ -174,6 +179,7 @@ export default function OwnerPage() {
                 onChange={async e => {
                   const file = e.target.files && e.target.files[0];
                   if (!file) return;
+                  setSearchLoading(true);
                   try {
                     const data = await searchImageApi(file);
                     if (data && Array.isArray(data.results)) {
@@ -183,6 +189,8 @@ export default function OwnerPage() {
                     }
                   } catch (err) {
                     setResults([]);
+                  } finally {
+                    setSearchLoading(false);
                   }
                 }}
               />
@@ -200,17 +208,25 @@ export default function OwnerPage() {
               ))}
             </Box>
           </Box>
-          <Grid container spacing={2} sx={{ mt: 2 }}>
-            {filteredProducts.map(r => (
-              <Grid item xs={12} sm={6} md={4} key={r.id}>
-                <ProductCard p={r} onOpen={setSelected} />
+          {searchLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 120 }}>
+              <CircularProgress size={48} />
+            </Box>
+          ) : (
+            <>
+              <Grid container spacing={2} sx={{ mt: 2 }}>
+                {filteredProducts.map(r => (
+                  <Grid item xs={12} sm={6} md={4} key={r.id}>
+                    <ProductCard p={r} onOpen={setSelected} />
+                  </Grid>
+                ))}
               </Grid>
-            ))}
-          </Grid>
-          {filteredProducts.length === 0 && (
-            <Typography align="center" color="text.secondary" sx={{ py: 4 }}>
-              No products found matching your search criteria.
-            </Typography>
+              {filteredProducts.length === 0 && (
+                <Typography align="center" color="text.secondary" sx={{ py: 4 }}>
+                  No products found matching your search criteria.
+                </Typography>
+              )}
+            </>
           )}
         </Paper>
 
