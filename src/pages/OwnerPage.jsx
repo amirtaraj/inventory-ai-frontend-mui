@@ -17,7 +17,7 @@ import { fetchForecast } from '../config/predictApi';
 import { useNavigate } from 'react-router-dom';
 import { useCallback } from 'react';
 import { useEffect } from 'react';
-
+ 
 import CircularProgress from '@mui/material/CircularProgress';
 export default function OwnerPage() {
   const [query, setQuery] = useState('');
@@ -31,13 +31,13 @@ export default function OwnerPage() {
   const [stats, setStats] = useState(null);
   const [loadingStats, setLoadingStats] = useState(true);
   const [statsError, setStatsError] = useState(null);
-
+ 
   const navigate = useNavigate();
   // Defective scan handler: route to /defective-items
   const handleDefectiveScan = () => {
     navigate('/defective-items');
   };
-
+ 
   useEffect(() => {
     setLoadingStats(true);
     fetchInventoryAnalysis()
@@ -62,19 +62,19 @@ export default function OwnerPage() {
         setDefaultCategoryResults([]);
       });
   }, []);
-
+ 
   // Stats (prefer API if available)
   const totalProducts = stats?.total_products ?? results.length;
   const lowStockItems = stats?.low_stock_items?.count ?? stats?.low_stock_count ?? results.filter(p => p.stock && p.stock < 5).length;
   const defectiveItems = stats?.defective_count ?? results.filter(p => p.defective).length;
   const overstockItems = stats?.high_stock_items?.count ?? stats?.overstock_count ?? results.filter(p => p.stock && p.stock > 50).length;
-
+ 
   // Categories
   const categories = useMemo(() => {
     const cats = new Set(results.map(p => p.masterCategory));
     return ['all', ...cats];
   }, [results]);
-
+ 
   // Filtering
   const filteredProducts = (searchText.trim() === '' ? defaultCategoryResults : results).filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -83,7 +83,7 @@ export default function OwnerPage() {
     const matchesCategory = selectedCategory === 'all' || product.masterCategory === selectedCategory;
     return matchesSearch && matchesCategory;
   });
-
+ 
   // Search button handler
   const handleSearch = async () => {
     setQuery(searchText);
@@ -101,7 +101,7 @@ export default function OwnerPage() {
       setSearchLoading(false);
     }
   };
-
+ 
   // Mock predictive AI forecast — replace with your endpoint later
   function generateForecast() {
     const f = {
@@ -110,13 +110,13 @@ export default function OwnerPage() {
     };
     setForecast(f);
   }
-
+ 
   return (
     <div>
       <TopAppBar />
       <Container sx={{ mt: 4, mb: 6 }}>
         <Typography variant="h4" sx={{ mb: 2 }}>Owner Dashboard</Typography>
-
+ 
         {/* Stats Overview */}
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6} md={3}>
@@ -148,7 +148,7 @@ export default function OwnerPage() {
             </Paper>
           </Grid>
         </Grid>
-
+ 
         {/* Alerts Section (mocked) */}
         <Paper sx={{ p: 2, mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 1 }}>Active Alerts</Typography>
@@ -159,7 +159,7 @@ export default function OwnerPage() {
             {filteredProducts.length === 0 && <Typography>No active alerts.</Typography>}
           </Box>
         </Paper>
-
+ 
         {/* Product Inventory */}
         <Paper sx={{ p: 2, mb: 3 }}>
           <Typography variant="h6">Product Inventory</Typography>
@@ -186,6 +186,7 @@ export default function OwnerPage() {
                     const data = await searchImageApi(file);
                     if (data && Array.isArray(data.results)) {
                       setResults(data.results);
+                      setSearchText('image'); // force filteredProducts to use results
                     } else {
                       setResults([]);
                     }
@@ -231,7 +232,7 @@ export default function OwnerPage() {
             </>
           )}
         </Paper>
-
+ 
         {/* Analytics Tools */}
         <Grid container spacing={2}>
           <Grid item xs={12} md={4}>
@@ -293,9 +294,9 @@ export default function OwnerPage() {
             </Paper>
           </Grid>
         </Grid>
-
+ 
         {/* Forecast Table is now shown on /forecast-results page */}
-
+ 
       </Container>
       <ProductDialog open={!!selected} onClose={() => setSelected(null)} product={selected} />
       <Chatbot />
