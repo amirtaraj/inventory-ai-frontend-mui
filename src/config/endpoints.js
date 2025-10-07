@@ -1,3 +1,3 @@
 // API endpoints config
-export const BASE_URL = 'https://reggae-trio-implies-smallest.trycloudflare.com/';
+export const BASE_URL = 'https://album-jacket-rooms-participant.trycloudflare.com/';
 
